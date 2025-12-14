@@ -43,7 +43,7 @@ Certifique-se de ter o Python 3 instalado.
 
 ### 1. Clonar o Repositório
 ```bash
-git clone [https://github.com/Deleon-Santos/Gestao_Comandas.git](https://github.com/Deleon-Santos/Gestao_Comandas.git)
+git clone https://github.com/Deleon-Santos/Gestao_Comandas.git
 
 ```
 ### 2. Instale as dependencial e rode o script
