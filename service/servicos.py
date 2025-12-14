@@ -6,6 +6,7 @@ from models.models import Produto, Comanda, ItemComanda, Status
 class GerenciadorComandas:
     def __init__(self, session):
         self.session = session
+       
 
     # --- Métodos de Produto ---
 
@@ -28,21 +29,27 @@ class GerenciadorComandas:
 
     # --- Métodos de Comanda ---
 
-    def criar_comanda(self, mesa_numero):
+    def criar_comanda(self, mesa_numero_nova):
         """Cria uma nova comanda para uma mesa."""
-        nova_comanda = Comanda(mesa=mesa_numero)
+        nova_comanda = Comanda(mesa_numero=mesa_numero_nova)
+        nova_comanda.data_abertura = datetime.now()
+        
         self.session.add(nova_comanda)
+        
+        
         self.session.commit()
-        print(f"\nComanda #{nova_comanda.id} para Mesa {mesa_numero} criada.")
+        print(f"\nComanda #{nova_comanda.id} para Mesa {mesa_numero_nova} criada.")
         return nova_comanda
 
     def adicionar_item_a_comanda(self, comanda_id, produto_id, quantidade=1):
         """Adiciona um item a uma comanda existente."""
         comanda = self.session.get(Comanda, comanda_id)
         produto = self.session.get(Produto, produto_id)
+        nome = self.session.get(Produto, produto_id).nome
+        preco = self.session.get(Produto, produto_id).preco
 
-        if not comanda or not produto:
-            print("Comanda ou Produto não encontrado.")
+        if not comanda or not produto or not nome or not preco:
+            print("Faltam informações importantes para fecha a comanda.")
             return
 
         if comanda.status != Status.aberta:
@@ -54,7 +61,7 @@ class GerenciadorComandas:
             comanda_id=comanda_id,
             produto_id=produto_id,
             quantidade=quantidade,
-            preco_unitario=produto.preco
+            preco_unitario=preco
         )
         self.session.add(novo_item)
         self.session.commit()
@@ -84,3 +91,34 @@ class GerenciadorComandas:
         else:
             print(f"Comanda #{comanda_id} já está {comanda.status.value}.")
             return False
+        
+
+    def pagar_comanda(self, comanda_id):
+        """Finaliza o pagamento de uma comanda fechada."""
+        comanda = self.session.get(Comanda, comanda_id)
+        if not comanda:
+            print(f"Comanda {comanda_id} não encontrada.")
+            return False
+
+        if comanda.status == Status.paga:
+            print(f"Comanda {comanda_id} já está PAGA.")
+            return True
+
+        if comanda.status == Status.aberta:
+            print(f"Comanda {comanda_id} deve ser FECHADA antes de ser paga.")
+            return False
+
+        # Se o status for FECHADA, pode ser paga
+        comanda.status = Status.paga
+        self.session.commit()
+        print(f"Comanda {comanda_id} paga com sucesso.")
+        return True
+
+    def cancelar_comanda(self, comanda_id):
+        """Cancela uma comanda (deleta do sistema)."""
+        comanda = self.session.get(Comanda, comanda_id)
+        if comanda:
+            comanda.status = Status.cancelada
+            self.session.commit()
+            return True
+        return False

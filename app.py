@@ -1,55 +1,189 @@
+import streamlit as st
+from config.config import Base, engine, session
+from models.models import Produto, Comanda, ItemComanda, Status
+from sqlalchemy import desc
+from service.servicos import GerenciadorComandas # Importe a classe do seu arquivo service.py
+import enum 
+# Inicializa o banco de dados e o gerenciador
+Base.metadata.create_all(engine)
+gc = GerenciadorComandas(session)
 
+st.set_page_config(layout="wide", page_title="Sistema de Gestão de Comandas")
+st.title("🍽️ Gestão de Comandas")
 
+# --- Funções Auxiliares de Visualização ---
 
-from config.config import session, engine, Base
-from service.servicos import GerenciadorComandas
+def formatar_comanda(comanda):
+    """Formata a exibição de uma comanda."""
+    total = gc.calcular_total_comanda(comanda.id)
+    itens_str = ", ".join([f"{item.quantidade}x {item.produto.nome}" for item in comanda.itens])
+    return f"Mesa_numero: {comanda.mesa_numero} | Total: R$ {total:.2f} | Status: {comanda.status.value}"
 
+# --- Estrutura da Interface com Abas ---
 
-if __name__ == '__main__':
-    # 1. Garante que as tabelas existam no SQLite
-    print("Criando tabelas no DB...")
-    Base.metadata.create_all(engine)
+tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Comandas e Pedidos", "Pagamento e Fechamento", "Gestão de Cardápio"])
+
+# --- ABA 1: Comandas e Pedidos ---
+with tab_comandas:
+    st.header("Comandas Abertas")
     
-    # Instancia o gerenciador de comandos
-    gc = GerenciadorComandas(session)
+    col1, col2 = st.columns([1, 1])
 
-    # 2. Adiciona Produtos
-    print("\n--- Cadastro de Produtos ---")
-    gc.adicionar_produto("Refrigerante Cola", 6.00)
-    gc.adicionar_produto("Porção de Batata Frita", 25.50)
-    gc.adicionar_produto("Hamburger Gourmet", 35.00)
-    
-    produtos = gc.listar_produtos()
-    print("\nProdutos Atuais:")
-    for p in produtos:
-        print(p)
+    with col1:
+        st.subheader("Nova Comanda")
+        mesa_numero_nova = st.number_input("Número da Mesa_numero", min_value=1, value=1, key="mesa_numero_nova")
+        if st.button("Abrir Nova Comanda"):
+            gc.criar_comanda(mesa_numero_nova)
+            st.success(f"Comanda aberta para a Mesa_numero {mesa_numero_nova}!")
+            st.rerun()
 
-    # 3. Cria e Gerencia Comandas
-    
-    # Comanda para Mesa 5
-    comanda1 = gc.criar_comanda(mesa_numero=5)
-    
-    # Adiciona itens usando os IDs dos produtos
-    # Refri ID=1, Batata ID=2, Burger ID=3 (assumindo a ordem de inserção)
-    gc.adicionar_item_a_comanda(comanda1.id, 1, quantidade=2) # 2x Refri
-    gc.adicionar_item_a_comanda(comanda1.id, 3, quantidade=1) # 1x Burger
+    with col2:
+        st.subheader("Adicionar Item ao Pedido")
+        comandas_abertas = gc.session.query(Comanda).filter(Comanda.status == Status.aberta).all()
+        produtos = gc.listar_produtos()
 
-    # Comanda para Mesa 10
-    comanda2 = gc.criar_comanda(mesa_numero=10)
-    gc.adicionar_item_a_comanda(comanda2.id, 2, quantidade=3) # 3x Batata
+        if not comandas_abertas or not produtos:
+            st.warning("Não há comandas abertas ou produtos cadastrados.")
+        else:
+            comanda_selecionada = st.selectbox(
+                "Selecione a Comanda (Mesa_numero)",
+                options=comandas_abertas,
+                format_func=lambda c: f"Comanda #{c.id} - Mesa_numero {c.mesa_numero}",
+                key="comanda_adicionar_item"
+            )
 
-    # 4. Cálculo e Fechamento
-    
-    print("\n--- Fechamento da Comanda 1 ---")
-    total1 = gc.calcular_total_comanda(comanda1.id)
-    print(f"Total da Comanda {comanda1.id} (Mesa {comanda1.mesa_numero}): R$ {total1:.2f}")
+            produto_selecionado = st.selectbox(
+                "Selecione o Produto",
+                options=produtos,
+                format_func=lambda p: f"{p.nome} (R$ {p.preco:.2f})",
+                key="produto_adicionar_item"
+            )
 
-    gc.fechar_comanda(comanda1.id)
+            quantidade = st.number_input("Quantidade", min_value=1, value=1, key="qtd_adicionar")
+
+            if st.button("Adicionar à Comanda"):
+                gc.adicionar_item_a_comanda(
+                    comanda_selecionada.id,
+                    produto_selecionado.id,
+                    quantidade
+                )
+                st.success(f"{quantidade}x {produto_selecionado.nome} adicionado à Comanda {comanda_selecionada.id}!")
+                st.rerun()
+
+    st.markdown("---")
+    st.subheader("Visualizar Comandas")
+
+    # ... (código anterior da with tab_comandas) ...
+
+    st.markdown("---")
+    st.subheader("Visualizar Comandas")
+
+    # --- NOVO FILTRO DE STATUS ---
+    status_options = ["TODAS"] + [s.value for s in Status]
+    filtro_status = st.selectbox("Filtrar por Status", options=status_options, key="filtro_status")
+
+    # --- LÓGICA DE FILTRAGEM ---
+    # Inicia a consulta
+    query = gc.session.query(Comanda)
+
     
-    # Tenta adicionar item em comanda fechada
-    gc.adicionar_item_a_comanda(comanda1.id, 1, quantidade=1)
+    # Lembre-se de corrigir a importação/uso do 'desc' conforme a última interação:
+    from sqlalchemy import desc # Assegure-se que isso esteja no topo do seu app.py
+
+    todas_comandas = query.order_by(desc(Comanda.data_abertura)).all()
     
-    print("\n--- Fechamento da Comanda 2 ---")
-    total2 = gc.calcular_total_comanda(comanda2.id)
-    print(f"Total da Comanda {comanda2.id} (Mesa {comanda2.mesa_numero}): R$ {total2:.2f}")
-    gc.fechar_comanda(comanda2.id)
+    # --- FIM DA LÓGICA DE FILTRAGEM ---
+
+    if todas_comandas:
+        for comanda in todas_comandas:
+            total = gc.calcular_total_comanda(comanda.id)
+            
+            # Layout de cartão para cada comanda
+            with st.expander(f"Comanda #{comanda.id} | Mesa {comanda.mesa_numero} | Status: {comanda.status.value} | Total: R$ {total:.2f}"):
+                
+                st.write(f"**Data de Abertura:** {comanda.data_abertura.strftime('%d/%m/%Y %H:%M')}")
+                
+                st.write(f"**Data de Fechamento:** {comanda.data_fechamento.strftime('%d/%m/%Y %H:%M') if comanda.data_fechamento else 'Aberto'}")
+                st.write(f"**Status:** {comanda.status.value}")
+                
+                st.markdown("---")
+                st.write("**Itens do Pedido:**")
+                
+                # Exibe os itens
+                if comanda.itens:
+                    for item in comanda.itens:
+                        st.write(f"- {item.quantidade}x {item.produto.nome} @ R$ {item.preco_unitario:.2f} = R$ {(item.quantidade * item.preco_unitario):.2f}")
+                else:
+                    st.write("Nenhum item nesta comanda.")
+                
+                # Ações rápidas (mantidas inalteradas)
+                col_acoes1, col_acoes2 = st.columns(2)
+                
+                with col_acoes1:
+                    if comanda.status == Status.aberta and st.button("Encerrar Comanda", key=f"encerrar_{comanda.id}"):
+                        gc.fechar_comanda(comanda.id)
+                        st.success(f"Comanda {comanda.id} encerrada!")
+                        st.rerun()
+
+                with col_acoes2:
+                    if comanda.status == Status.aberta and st.button("Cancelar Comanda", key=f"cancelar_{comanda.id}"):
+                        if gc.cancelar_comanda(comanda.id):
+                            st.success(f"Comanda {comanda.id} cancelada e removida!")
+                            st.rerun()
+                        else:
+                            st.error("Erro ao cancelar comanda.")
+    else:
+        st.info("Nenhuma comanda encontrada com o filtro selecionado.")
+# --- ABA 2: Pagamento e Fechamento ---
+with tab_pagamento:
+    st.header("Pagamento e Fechamento")
+    
+    comandas_fechadas = gc.session.query(Comanda).filter(Comanda.status == Status.fechada).all()
+    
+    st.subheader("Comandas Prontas para Pagamento")
+
+    if not comandas_fechadas:
+        st.info("Não há comandas fechadas aguardando pagamento.")
+    else:
+        comanda_a_pagar = st.selectbox(
+            "Selecione a Comanda para Pagar",
+            options=comandas_fechadas,
+            format_func=formatar_comanda,
+            key="comanda_pagar"
+        )
+        
+        if comanda_a_pagar and st.button(f"Confirmar Pagamento da Comanda {comanda_a_pagar.id}"):
+            if gc.pagar_comanda(comanda_a_pagar.id):
+                st.success(f"Pagamento da Comanda {comanda_a_pagar.id} efetuado com sucesso!")
+            else:
+                st.error("Erro ao processar pagamento.")
+            st.rerun()
+
+
+# --- ABA 3: Gestão de Cardápio (Novo Produto) ---
+with tab_produtos:
+    st.header("Cadastro de Novo Produto")
+    
+    with st.form("form_novo_produto"):
+        novo_nome = st.text_input("Nome do Produto", max_chars=100)
+        novo_preco = st.number_input("Preço (R$)", min_value=0.01, format="%.2f", value=10.00)
+        submitted = st.form_submit_button("Cadastrar Produto")
+        
+        if submitted:
+            if novo_nome and novo_preco:
+                gc.adicionar_produto(novo_nome, novo_preco)
+                st.success(f"Produto '{novo_nome}' cadastrado por R$ {novo_preco:.2f}!")
+                st.rerun()
+            else:
+                st.error("Preencha todos os campos.")
+
+    st.markdown("---")
+    st.subheader("Cardápio Atual")
+    produtos_atuais = gc.listar_produtos()
+    
+    if produtos_atuais:
+        # Exibir em formato de tabela
+        produtos_data = [{"ID": p.id, "Nome": p.nome, "Preço": f"R$ {p.preco:.2f}"} for p in produtos_atuais]
+        st.table(produtos_data)
+    else:
+        st.info("Nenhum produto cadastrado.")

@@ -1,9 +1,10 @@
 
 
+import datetime
 import enum
 
 from sqlalchemy.orm import relationship
-from sqlalchemy import Column, Integer, String, Float, ForeignKey, Enum
+from sqlalchemy import Column, DateTime, Integer, String, Float, ForeignKey, Enum
 
 from config.config import Base
 
@@ -30,7 +31,11 @@ class Comanda(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     mesa_numero = Column(Integer, nullable=False)
     status = Column(Enum(Status), default=Status.aberta, nullable=False)
+    data_abertura = Column(DateTime, default=datetime.datetime.now,nullable=True)
+    data_fechamento = Column(DateTime, nullable=True)
+
     itens = relationship("ItemComanda", back_populates="comanda", cascade="all, delete-orphan")
+    
 
     def __repr__(self):
         return f"<Comanda(id={self.id}, mesa_numero={self.mesa_numero}, status={self.status})>" 
@@ -42,9 +47,11 @@ class ItemComanda(Base):
     comanda_id = Column(Integer, ForeignKey("comandas.id"), nullable=False)
     produto_id = Column(Integer, ForeignKey("produtos.id"), nullable=False)
     quantidade = Column(Integer, nullable=False, default=1)
+    preco_unitario = Column(Float, nullable=False)  # Preço unitário no momento do pedido
+    
 
     comanda = relationship("Comanda", back_populates="itens")
     produto = relationship("Produto")
 
     def __repr__(self):
-        return f"<ItemComanda(id={self.id}, comanda_id={self.comanda_id}, produto_id={self.produto_id}, quantidade={self.quantidade})>"
+        return f"<ItemComanda(id={self.id}, comanda_id={self.comanda_id}, produto_id={self.produto_id}, quantidade={self.quantidade}, preco_unitario={self.preco_unitario})>"
