@@ -1,15 +1,15 @@
 import streamlit as st
 from config.config import Base, engine, session
-from models.models import Produto, Comanda, ItemComanda, Status
+from models.models import Comanda, Status
 from sqlalchemy import desc
-from service.servicos import GerenciadorComandas # Importe a classe do seu arquivo service.py
-import enum 
+from service.servicos import GerenciadorComandas
+
 # Inicializa o banco de dados e o gerenciador
 Base.metadata.create_all(engine)
 gc = GerenciadorComandas(session)
 
 st.set_page_config(layout="wide", page_title="Sistema de Gestão de Comandas")
-st.title("🍽️ Gestão de Comandas")
+st.markdown("<h1 style='text-align: center; color: #007BFF;'>🍽️ Gestão de Comandas</h1>", unsafe_allow_html=True)
 
 # --- Funções Auxiliares de Visualização ---
 
@@ -23,7 +23,7 @@ def formatar_comanda(comanda):
 
 tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Comandas e Pedidos", "Pagamento e Fechamento", "Gestão de Cardápio"])
 
-# --- ABA 1: Comandas e Pedidos ---
+
 with tab_comandas:
     st.header("Comandas Abertas")
     
@@ -73,32 +73,21 @@ with tab_comandas:
     st.markdown("---")
     st.subheader("Visualizar Comandas")
 
-    # ... (código anterior da with tab_comandas) ...
-
     st.markdown("---")
     st.subheader("Visualizar Comandas")
 
-    # --- NOVO FILTRO DE STATUS ---
     status_options = ["TODAS"] + [s.value for s in Status]
     filtro_status = st.selectbox("Filtrar por Status", options=status_options, key="filtro_status")
 
-    # --- LÓGICA DE FILTRAGEM ---
-    # Inicia a consulta
-    query = gc.session.query(Comanda)
-
-    
-    # Lembre-se de corrigir a importação/uso do 'desc' conforme a última interação:
-    from sqlalchemy import desc # Assegure-se que isso esteja no topo do seu app.py
+    query = gc.session.query(Comanda) 
 
     todas_comandas = query.order_by(desc(Comanda.data_abertura)).all()
     
-    # --- FIM DA LÓGICA DE FILTRAGEM ---
 
     if todas_comandas:
         for comanda in todas_comandas:
             total = gc.calcular_total_comanda(comanda.id)
             
-            # Layout de cartão para cada comanda
             with st.expander(f"Comanda #{comanda.id} | Mesa {comanda.mesa_numero} | Status: {comanda.status.value} | Total: R$ {total:.2f}"):
                 
                 st.write(f"**Data de Abertura:** {comanda.data_abertura.strftime('%d/%m/%Y %H:%M')}")
@@ -109,14 +98,12 @@ with tab_comandas:
                 st.markdown("---")
                 st.write("**Itens do Pedido:**")
                 
-                # Exibe os itens
                 if comanda.itens:
                     for item in comanda.itens:
                         st.write(f"- {item.quantidade}x {item.produto.nome} @ R$ {item.preco_unitario:.2f} = R$ {(item.quantidade * item.preco_unitario):.2f}")
                 else:
                     st.write("Nenhum item nesta comanda.")
                 
-                # Ações rápidas (mantidas inalteradas)
                 col_acoes1, col_acoes2 = st.columns(2)
                 
                 with col_acoes1:
@@ -134,7 +121,8 @@ with tab_comandas:
                             st.error("Erro ao cancelar comanda.")
     else:
         st.info("Nenhuma comanda encontrada com o filtro selecionado.")
-# --- ABA 2: Pagamento e Fechamento ---
+
+
 with tab_pagamento:
     st.header("Pagamento e Fechamento")
     
@@ -160,7 +148,7 @@ with tab_pagamento:
             st.rerun()
 
 
-# --- ABA 3: Gestão de Cardápio (Novo Produto) ---
+
 with tab_produtos:
     st.header("Cadastro de Novo Produto")
     
@@ -182,7 +170,6 @@ with tab_produtos:
     produtos_atuais = gc.listar_produtos()
     
     if produtos_atuais:
-        # Exibir em formato de tabela
         produtos_data = [{"ID": p.id, "Nome": p.nome, "Preço": f"R$ {p.preco:.2f}"} for p in produtos_atuais]
         st.table(produtos_data)
     else:

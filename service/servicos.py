@@ -1,4 +1,3 @@
-
 from datetime import datetime
 from models.models import Produto, Comanda, ItemComanda, Status
 
@@ -7,9 +6,6 @@ class GerenciadorComandas:
     def __init__(self, session):
         self.session = session
        
-
-    # --- Métodos de Produto ---
-
     def adicionar_produto(self, nome, preco):
         """Adiciona um novo produto ao cardápio."""
         try:
@@ -27,16 +23,13 @@ class GerenciadorComandas:
         """Lista todos os produtos no cardápio."""
         return self.session.query(Produto).all()
 
-    # --- Métodos de Comanda ---
-
     def criar_comanda(self, mesa_numero_nova):
         """Cria uma nova comanda para uma mesa."""
         nova_comanda = Comanda(mesa_numero=mesa_numero_nova)
         nova_comanda.data_abertura = datetime.now()
         
         self.session.add(nova_comanda)
-        
-        
+         
         self.session.commit()
         print(f"\nComanda #{nova_comanda.id} para Mesa {mesa_numero_nova} criada.")
         return nova_comanda
@@ -56,7 +49,6 @@ class GerenciadorComandas:
              print(f"Não é possível adicionar itens. Comanda está {comanda.status.value}.")
              return
 
-        # Garante que o preço unitário seja o preço atual do produto no momento do pedido
         novo_item = ItemComanda(
             comanda_id=comanda_id,
             produto_id=produto_id,
@@ -92,7 +84,6 @@ class GerenciadorComandas:
             print(f"Comanda #{comanda_id} já está {comanda.status.value}.")
             return False
         
-
     def pagar_comanda(self, comanda_id):
         """Finaliza o pagamento de uma comanda fechada."""
         comanda = self.session.get(Comanda, comanda_id)
@@ -108,7 +99,6 @@ class GerenciadorComandas:
             print(f"Comanda {comanda_id} deve ser FECHADA antes de ser paga.")
             return False
 
-        # Se o status for FECHADA, pode ser paga
         comanda.status = Status.paga
         self.session.commit()
         print(f"Comanda {comanda_id} paga com sucesso.")

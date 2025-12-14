@@ -1,11 +1,7 @@
-
-
 import datetime
 import enum
-
 from sqlalchemy.orm import relationship
 from sqlalchemy import Column, DateTime, Integer, String, Float, ForeignKey, Enum
-
 from config.config import Base
 
 
@@ -36,7 +32,6 @@ class Comanda(Base):
 
     itens = relationship("ItemComanda", back_populates="comanda", cascade="all, delete-orphan")
     
-
     def __repr__(self):
         return f"<Comanda(id={self.id}, mesa_numero={self.mesa_numero}, status={self.status})>" 
     
@@ -47,7 +42,7 @@ class ItemComanda(Base):
     comanda_id = Column(Integer, ForeignKey("comandas.id"), nullable=False)
     produto_id = Column(Integer, ForeignKey("produtos.id"), nullable=False)
     quantidade = Column(Integer, nullable=False, default=1)
-    preco_unitario = Column(Float, nullable=False)  # Preço unitário no momento do pedido
+    preco_unitario = Column(Float, nullable=False) 
     
 
     comanda = relationship("Comanda", back_populates="itens")

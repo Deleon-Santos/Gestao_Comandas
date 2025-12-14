@@ -1,0 +1,6 @@
+# dependencia minimas para o funcionamento do sistema
+
+SQLAlchemy==2.0.45
+streamlit==1.52.1
+
+
