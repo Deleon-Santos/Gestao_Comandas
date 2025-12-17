@@ -11,19 +11,19 @@ class Status(enum.Enum):
     paga = "paga"
     cancelada = "cancelada"
 
+
 class Produto(Base):
     __tablename__ = "produtos"
-
     id = Column(Integer, primary_key=True, autoincrement=True)
     nome = Column(String, nullable=False)
     preco = Column(Float, nullable=False)
 
     def __repr__(self):
         return f"<Produto(id={self.id}, nome={self.nome}, preco={self.preco})>"
-    
+
+
 class Comanda(Base):
     __tablename__ = "comandas"
-
     id = Column(Integer, primary_key=True, autoincrement=True)
     mesa_numero = Column(Integer, nullable=False)
     status = Column(Enum(Status), default=Status.aberta, nullable=False)
@@ -34,17 +34,16 @@ class Comanda(Base):
     
     def __repr__(self):
         return f"<Comanda(id={self.id}, mesa_numero={self.mesa_numero}, status={self.status})>" 
-    
+
+
 class ItemComanda(Base):
     __tablename__ = "itens_comanda"
-
     id = Column(Integer, primary_key=True, autoincrement=True)
     comanda_id = Column(Integer, ForeignKey("comandas.id"), nullable=False)
     produto_id = Column(Integer, ForeignKey("produtos.id"), nullable=False)
     quantidade = Column(Integer, nullable=False, default=1)
     preco_unitario = Column(Float, nullable=False) 
     
-
     comanda = relationship("Comanda", back_populates="itens")
     produto = relationship("Produto")
 

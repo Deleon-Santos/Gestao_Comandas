@@ -7,7 +7,6 @@ class GerenciadorComandas:
         self.session = session
        
     def adicionar_produto(self, nome, preco):
-        """Adiciona um novo produto ao cardápio."""
         try:
             novo_produto = Produto(nome=nome, preco=preco)
             self.session.add(novo_produto)
@@ -20,11 +19,9 @@ class GerenciadorComandas:
             return None
 
     def listar_produtos(self):
-        """Lista todos os produtos no cardápio."""
         return self.session.query(Produto).all()
 
     def criar_comanda(self, mesa_numero_nova):
-        """Cria uma nova comanda para uma mesa."""
         nova_comanda = Comanda(mesa_numero=mesa_numero_nova)
         nova_comanda.data_abertura = datetime.now()
         
@@ -35,7 +32,6 @@ class GerenciadorComandas:
         return nova_comanda
 
     def adicionar_item_a_comanda(self, comanda_id, produto_id, quantidade=1):
-        """Adiciona um item a uma comanda existente."""
         comanda = self.session.get(Comanda, comanda_id)
         produto = self.session.get(Produto, produto_id)
         nome = self.session.get(Produto, produto_id).nome
@@ -60,7 +56,6 @@ class GerenciadorComandas:
         print(f"-> {quantidade}x '{produto.nome}' adicionado à Comanda #{comanda_id}.")
 
     def calcular_total_comanda(self, comanda_id):
-        """Calcula o valor total de uma comanda."""
         comanda = self.session.get(Comanda, comanda_id)
         if not comanda:
             return 0.0
@@ -69,7 +64,6 @@ class GerenciadorComandas:
         return total
 
     def fechar_comanda(self, comanda_id):
-        """Fecha a comanda, definindo a data de fechamento e status."""
         comanda = self.session.get(Comanda, comanda_id)
         if not comanda:
             return False
@@ -85,7 +79,6 @@ class GerenciadorComandas:
             return False
         
     def pagar_comanda(self, comanda_id):
-        """Finaliza o pagamento de uma comanda fechada."""
         comanda = self.session.get(Comanda, comanda_id)
         if not comanda:
             print(f"Comanda {comanda_id} não encontrada.")
@@ -105,7 +98,6 @@ class GerenciadorComandas:
         return True
 
     def cancelar_comanda(self, comanda_id):
-        """Cancela uma comanda (deleta do sistema)."""
         comanda = self.session.get(Comanda, comanda_id)
         if comanda:
             comanda.status = Status.cancelada
