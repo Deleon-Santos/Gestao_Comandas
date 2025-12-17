@@ -12,7 +12,7 @@ O sistema é dividido em três abas principais, oferecendo controle total sobre 
 * **Abertura de Comanda:** Permite abrir uma nova comanda associada a um número de mesa específico.
 * **Adição de Itens:** Adiciona múltiplos produtos do cardápio à comanda selecionada, registrando a quantidade e o preço unitário.
 * **Visualização Detalhada:** Exibe todas as comandas, mostrando a data de abertura, status, itens pedidos e o total parcial.
-* **Filtro por Status:** Permite visualizar comandas filtradas por `Aberta`, `Fechada`, `Cancelada` ou `Paga`.
+* **Filtro por Status:** Permite visualizar comandas filtradas por `TODAS`, `Aberta`, `Fechada`, `Cancelada` ou `Paga`.
 * **Ações Rápidas:** Botões para encerrar a comanda (pronta para pagamento) ou cancelar a comanda.
 
 ### 2. Pagamento e Fechamento
@@ -50,3 +50,10 @@ git clone https://github.com/Deleon-Santos/Gestao_Comandas.git
 ```bash
 streamlit run app.py
 ```
+### Melhorias
+Comverter o Banco de Dados para PostgreSQL e efetuar deploy.
+
+## Licença
+MIT License.
+Copyright (c) 2025 DELEON SANTOS.
+
