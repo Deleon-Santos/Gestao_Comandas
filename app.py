@@ -4,7 +4,7 @@ from models.models import Comanda, Status
 from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
 from service.servicos import GerenciadorComandas
-
+import time
 # Inicializa o banco de dados e o gerenciador
 Base.metadata.create_all(engine)
 gc = GerenciadorComandas(session)
@@ -20,6 +20,7 @@ def formatar_comanda(comanda):
     itens_str = ", ".join([f"{item.quantidade}x {item.produto.nome}" for item in comanda.itens])
     return f"Comanda #{comanda.id} | Mesa {comanda.mesa_numero} | Total: R$ {total:.2f} | Status: {comanda.status.value}"
 
+
 #Estrutura da Interface com Abas 
 tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Comandas", "Pagamento e Fechamento", "Gestão de Cardápio"])
 
@@ -34,8 +35,9 @@ with tab_pedidos:
         if st.button("Abrir Nova Comanda"):
             gc.criar_comanda(mesa_numero_nova)
             st.success(f"Nova Comanda aberta para a Mesa {mesa_numero_nova}!")
-            st.warning(f"Nova Comanda Aberta para a mesa {mesa_numero_nova}.")
+            time.sleep(0.5)
             st.rerun()
+    
 
         st.subheader("Adicionar Item ao Pedido")
         comandas_abertas = (
@@ -73,7 +75,6 @@ with tab_pedidos:
                     status_placeholder.info("Adicionando item ao pedido...")
                     progress_bar = status_placeholder.progress(0)
                     
-                    import time
                     for percent_complete in range(10, 101, 10):
                         progress_bar.progress(percent_complete)
                         time.sleep(0.01) # pequena pausa para simular o progresso
@@ -86,7 +87,7 @@ with tab_pedidos:
                     
                     status_placeholder.empty() 
                     st.success(f"{quantidade}x {produto_selecionado.nome} adicionado à Comanda {comanda_selecionada.id}!")
-
+                    time.sleep(0.5)
                     st.rerun()
 
 # Exibição das Comandas 
@@ -156,15 +157,18 @@ with tab_comandas:
                     if comanda.status == Status.aberta and st.button("Encerrar Comanda", key=f"encerrar_{comanda.id}"):
                         gc.fechar_comanda(comanda.id)
                         st.success(f"Comanda {comanda.id} encerrada!")
+                        time.sleep(0.5)
                         st.rerun()
 
                 with col_acoes2:
                     if comanda.status == Status.aberta and st.button("Cancelar Comanda", key=f"cancelar_{comanda.id}"):
                         if gc.cancelar_comanda(comanda.id):
                             st.success(f"Comanda {comanda.id} cancelada e removida!")
+                            time.sleep(0.5)
                             st.rerun()
                         else:
                             st.error("Erro ao cancelar comanda.")
+
     else:
         st.info("Nenhuma comanda encontrada com o filtro selecionado.")
 
@@ -190,8 +194,10 @@ with tab_pagamento:
         if comanda_a_pagar and st.button(f"Confirmar Pagamento"):
             if gc.pagar_comanda(comanda_a_pagar.id):
                 st.success(f"Pagamento da Comanda {comanda_a_pagar.id} efetuado com sucesso!")
+                time.sleep(0.5)
             else:
                 st.error("Erro ao processar pagamento.")
+                time.sleep(0.5)
             st.rerun()
 
 
@@ -209,6 +215,7 @@ with tab_produtos:
             if novo_nome and novo_preco:
                 gc.adicionar_produto(novo_nome, novo_preco)
                 st.success(f"Produto '{novo_nome}' cadastrado por R$ {novo_preco:.2f}!")
+                time.sleep(0.5)
                 st.rerun()
             else:
                 st.error("Preencha todos os campos.")
