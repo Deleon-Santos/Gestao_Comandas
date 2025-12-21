@@ -20,7 +20,6 @@ st.markdown("<h1 style='text-align: center; color: #007BFF;'>🍽️ Gestão de 
 # Funções Auxiliares de Visualização 
 
 def formatar_comanda(comanda):
-    """Formata a exibição de uma comanda."""
     total = gc.calcular_total_comanda(comanda.id)
     itens_str = ", ".join([f"{item.quantidade}x {item.produto.nome}" for item in comanda.itens])
     return f"Comanda #{comanda.id} | Mesa {comanda.mesa_numero} | Total: R$ {total:.2f} | Status: {comanda.status.value}"
@@ -32,7 +31,7 @@ tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Co
 
 # Gestão de Pedidos
 with tab_pedidos:
-    st.markdown("<h2 style='text-align: lefth; color: #000000;'>Pedidos</h2>", unsafe_allow_html=True)
+    st.header("Pedidos")
     col1, col2 = st.tabs(["Add Comandas", "Add Produtos"])
 
     with col1:
@@ -114,7 +113,7 @@ with tab_pedidos:
 
 # Exibição das Comandas 
 with tab_comandas:
-    st.markdown("<h2 style='text-align: lefth; color: #000000;'>Comandas</h2>", unsafe_allow_html=True)
+    st.header("Comandas")
     st.subheader("Visualizar Comandas")
 
     col_filtro_status, col_filtro_itens = st.columns(2)
