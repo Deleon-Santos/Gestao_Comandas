@@ -5,8 +5,13 @@ from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
 from service.servicos import GerenciadorComandas
 import time
-# Inicializa o banco de dados e o gerenciador
-Base.metadata.create_all(engine)
+
+
+try:
+    Base.metadata.create_all(engine)
+except Exception as e:
+    st.error(f"Erro Real: {e}") 
+
 gc = GerenciadorComandas(session)
 
 st.set_page_config(layout="wide", page_title="Sistema de Gestão de Comandas")
