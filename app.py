@@ -90,7 +90,9 @@ with tab_pedidos:
             st.rerun()
 
         st.markdown("**Itens na Comanda Selecionada:**")
-        if comanda_selecionada.itens:
+        if comanda_selecionada is None:
+            st.info("Selecione uma comanda válida para ver os detalhes.")
+        elif comanda_selecionada.itens:
             itens_data = []
             for item in comanda_selecionada.itens:
                 subtotal = item.quantidade * item.preco_unitario
