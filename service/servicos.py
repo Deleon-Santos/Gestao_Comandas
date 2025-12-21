@@ -104,3 +104,18 @@ class GerenciadorComandas:
             self.session.commit()
             return True
         return False
+    
+    def atualizar_produto(self, produto_id, novo_nome=None, novo_preco=None):
+        produto = self.session.get(Produto, produto_id)
+        if not produto:
+            print(f"Produto com ID {produto_id} não encontrado.")
+            return False
+
+        if novo_nome:
+            produto.nome = novo_nome
+        if novo_preco is not None:
+            produto.preco = novo_preco
+
+        self.session.commit()
+        print(f"Produto ID {produto_id} atualizado com sucesso.")
+        return True

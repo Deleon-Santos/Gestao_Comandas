@@ -1,6 +1,6 @@
-# dependencia minimas para o funcionamento do sistema
 
+python-dotenv==1.0.1
+psycopg2-binary==2.9.6
 SQLAlchemy==2.0.45
-streamlit==1.52.1
-
+streamlit==1.52.2
 

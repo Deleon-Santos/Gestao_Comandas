@@ -204,22 +204,47 @@ with tab_pagamento:
 # Gestão de Cardápio
 with tab_produtos:
     st.header("Gestão de Cardápio")
-    st.subheader("Cadastro de Novo Produto")
     
-    with st.form("form_novo_produto"):
-        novo_nome = st.text_input("Nome do Produto", max_chars=100)
-        novo_preco = st.number_input("Preço (R$)", min_value=0.01, format="%.2f", value=10.00)
-        submitted = st.form_submit_button("Cadastrar Produto")
-        
-        if submitted:
-            if novo_nome and novo_preco:
-                gc.adicionar_produto(novo_nome, novo_preco)
-                st.success(f"Produto '{novo_nome}' cadastrado por R$ {novo_preco:.2f}!")
-                time.sleep(0.5)
-                st.rerun()
-            else:
-                st.error("Preencha todos os campos.")
+    col1, col2 = st.tabs(["Cadastro", "Atualização"])
 
+# --- COLUNA 1: CADASTRO ---
+    with col1:
+        st.subheader("Cadastro de Novo Produto")
+        
+        with st.form("form_novo_produto"):
+            novo_nome = st.text_input("Nome do Produto", max_chars=100).capitalize()
+            novo_preco = st.number_input("Preço (R$)", min_value=0.01, format="%.2f", value=10.00)
+            submitted = st.form_submit_button("Cadastrar Produto")
+            
+            if submitted:
+                if novo_nome and novo_preco:
+                    gc.adicionar_produto(novo_nome, novo_preco)
+                    st.success(f"Produto '{novo_nome}' cadastrado!")
+                    time.sleep(0.5)
+                    st.rerun()
+                else:
+                    st.error("Preencha todos os campos.")
+
+    # --- COLUNA 2: ATUALIZAÇÃO ---
+    with col2:
+        st.subheader("Atualizar Produto")
+        
+        with st.form("Atualizar_produto"):
+            produto_id = st.number_input("ID do Produto a Atualizar", min_value=1, step=1)
+            novo_nome_att = st.text_input("Novo Nome do Produto", max_chars=100).capitalize()
+            novo_preco_att = st.number_input("Novo Preço (R$)", min_value=0.01, format="%.2f", value=10.00)
+            atualizar_submitted = st.form_submit_button("Atualizar Produto")
+
+            if atualizar_submitted:
+                if produto_id and novo_nome_att and novo_preco_att:
+                    gc.atualizar_produto(produto_id, novo_nome_att, novo_preco_att)
+                    st.success(f"Produto ID {produto_id} atualizado!")
+                    time.sleep(0.5)
+                    st.rerun()
+                else:
+                    st.error("Preencha todos os campos.")
+
+                    
     st.markdown("---")
     st.subheader("Cardápio Atual")
     produtos_atuais = gc.listar_produtos()
