@@ -17,11 +17,4 @@ Base = declarative_base()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 session = SessionLocal()
 
-# # Configuração alternativa para SQLite
-# DB_File = 'Comandas.db'
-
-# engine = create_engine('sqlite:///' + DB_File, echo=True)
-# Base = declarative_base()
-# session_L = sessionmaker(bind=engine)
-# session = session_L()
 
