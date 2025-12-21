@@ -2,7 +2,7 @@
 
 ## 📌 Objetivo do Projeto
 
-O Sistema de Gestão de Comandas é uma aplicação web leve, desenvolvida em Python, que visa digitalizar e simplificar a gestão de pedidos, mesas e pagamentos em pequenos bares, restaurantes ou cafeterias. Ele utiliza um banco de dados local (SQLite) para garantir a persistência dos dados de forma rápida e segura.
+O Sistema de Gestão de Comandas é uma aplicação web leve, desenvolvida em Python, que visa digitalizar e simplificar a gestão de pedidos, mesas e pagamentos em pequenos bares, restaurantes ou cafeterias. Ele utiliza um banco de dados postgres para garantir a persistência dos dados de forma rápida e segura.
 
 ## ✨ Funcionalidades Principais
 
@@ -27,10 +27,17 @@ O sistema é dividido em três abas principais, oferecendo controle total sobre 
 
 A aplicação é construída com uma arquitetura modular, separando a interface (front-end) da lógica de negócios e do acesso aos dados.
 
+## 🚀 Demonstração Online
+
+A aplicação está hospedada no Streamlit Cloud e utiliza um banco de dados **PostgreSQL** gerenciado no **Render**
+Você pode acessar o sistema em tempo real clicando no link 👉 [**Aqui**](https://gestaocomandas-xnuslt9x66pp6w5oad3r2t.streamlit.app/)
+
+---
+
 | Categoria | Tecnologia | Função |
 | :--- | :--- | :--- |
 | **Interface (UI)** | **Streamlit** | Criação da interface web interativa com Python. |
-| **Banco de Dados** | **SQLite** | Banco de dados leve e local, ideal para ambientes pequenos. |
+| **Banco de Dados** | **Postgres** | Banco de dados leve e local, ideal para ambientes pequenos. |
 | **Acesso a Dados (ORM)** | **SQLAlchemy** | Mapeador Objeto-Relacional para gerenciar o banco de dados usando classes Python. |
 | **Linguagem Principal** | **Python 3.x** | Linguagem utilizada para todo o desenvolvimento, incluindo o front-end e o back-end. |
 
