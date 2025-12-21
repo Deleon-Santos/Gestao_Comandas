@@ -1,6 +1,6 @@
 import streamlit as st
 from config.config import Base, engine, session
-from models.models import Comanda, Status
+from models.models import Comanda, ItemComanda, Status
 from sqlalchemy import desc
 from sqlalchemy.orm import selectinload
 from service.servicos import GerenciadorComandas
@@ -24,10 +24,11 @@ def formatar_comanda(comanda):
 #Estrutura da Interface com Abas 
 tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Comandas", "Pagamento e Fechamento", "Gestão de Cardápio"])
 
+
 # Gestão de Pedidos
 with tab_pedidos:
     st.markdown("<h2 style='text-align: lefth; color: #000000;'>Pedidos</h2>", unsafe_allow_html=True)
-    col1, col2 = st.columns([1, 1])
+    col1, col2 = st.tabs(["Add Comandas", "Add Produtos"])
 
     with col1:
         st.subheader("Nova Comanda")
@@ -38,57 +39,71 @@ with tab_pedidos:
             time.sleep(0.5)
             st.rerun()
     
-
-        st.subheader("Adicionar Item ao Pedido")
+    with col2:
+        st.markdown("Adicionar Item ao Pedido")
         comandas_abertas = (
-            gc.session.query(Comanda)
-            .options(selectinload(Comanda.itens))
-            .filter(Comanda.status == Status.aberta)
-            .all()
-        )
+        gc.session.query(Comanda).options(
+        selectinload(Comanda.itens).joinedload(ItemComanda.produto)  )
+        .filter(Comanda.status == Status.aberta).all() )
+       
         produtos = gc.listar_produtos()
 
         if not comandas_abertas or not produtos:
             st.warning("Não há comandas abertas ou produtos cadastrados.")
+        
+        comanda_selecionada = st.selectbox(
+            "Selecione a Comanda e Mesa",
+            options=comandas_abertas,
+            format_func=lambda c: f"Comanda #{c.id} - Mesa {c.mesa_numero}",
+            key="comanda_adicionar_item")
+        
+        produto_selecionado = st.selectbox(
+            "Selecione o Produto",
+            options=produtos,
+            format_func=lambda p: f"{p.nome} (R$ {p.preco:.2f})",
+            key="produto_adicionar_item")
+
+        quantidade = st.number_input("Quantidade", min_value=1, value=1, key="qtd_adicionar") 
+        
+        if st.button("Add item à Comanda"):
+            status_placeholder = st.empty()
+            status_placeholder.info("Adicionando item ao pedido...")
+            progress_bar = status_placeholder.progress(0)
+            
+            for percent_complete in range(10, 101, 10):
+                progress_bar.progress(percent_complete)
+                time.sleep(0.01) # pequena pausa para simular o progresso
+            
+            gc.adicionar_item_a_comanda(
+                comanda_selecionada.id,
+                produto_selecionado.id,
+                quantidade )
+            
+            status_placeholder.empty() 
+            st.success(f"{quantidade}x {produto_selecionado.nome} adicionado à Comanda {comanda_selecionada.id}!")
+            time.sleep(0.5)
+            st.rerun()
+
+        st.markdown("**Itens na Comanda Selecionada:**")
+        if comanda_selecionada.itens:
+            itens_data = []
+            for item in comanda_selecionada.itens:
+                subtotal = item.quantidade * item.preco_unitario
+                itens_data.append({
+                    "Qtd": item.quantidade,
+                    "Produto": item.produto.nome,
+                    "Preço Unit.": f"R$ {item.preco_unitario:.2f}",
+                    "Subtotal": f"R$ {subtotal:.2f}"
+                })
+            
+            st.dataframe(
+                itens_data,
+                hide_index=True, 
+                use_container_width=True 
+            )
         else:
-            col_select, col_display = st.columns([1, 1.5]) 
+            st.info("Nenhum item adicionado a esta comanda ainda.")
 
-            with col_select:
-                comanda_selecionada = st.selectbox(
-                    "Selecione a Comanda e Mesa",
-                    options=comandas_abertas,
-                    format_func=lambda c: f"Comanda #{c.id} - Mesa {c.mesa_numero}",
-                    key="comanda_adicionar_item"
-                )
-                
-                produto_selecionado = st.selectbox(
-                    "Selecione o Produto",
-                    options=produtos,
-                    format_func=lambda p: f"{p.nome} (R$ {p.preco:.2f})",
-                    key="produto_adicionar_item"
-                )
-
-                quantidade = st.number_input("Quantidade", min_value=1, value=1, key="qtd_adicionar") 
-                
-                if st.button("Add item à Comanda"):
-                    status_placeholder = st.empty()
-                    status_placeholder.info("Adicionando item ao pedido...")
-                    progress_bar = status_placeholder.progress(0)
-                    
-                    for percent_complete in range(10, 101, 10):
-                        progress_bar.progress(percent_complete)
-                        time.sleep(0.01) # pequena pausa para simular o progresso
-                    
-                    gc.adicionar_item_a_comanda(
-                        comanda_selecionada.id,
-                        produto_selecionado.id,
-                        quantidade
-                    )
-                    
-                    status_placeholder.empty() 
-                    st.success(f"{quantidade}x {produto_selecionado.nome} adicionado à Comanda {comanda_selecionada.id}!")
-                    time.sleep(0.5)
-                    st.rerun()
 
 # Exibição das Comandas 
 with tab_comandas:
