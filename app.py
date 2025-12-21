@@ -26,7 +26,7 @@ def formatar_comanda(comanda):
 
 
 #Estrutura da Interface com Abas 
-tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Comandas", "Pagamento e Fechamento", "Gestão de Cardápio"])
+tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Comandas", "Pagamento", "Gestão de Cardápio"])
 
 
 # Gestão de Pedidos
