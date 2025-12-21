@@ -20,6 +20,7 @@ if DATABASE_URL.startswith("postgres://"):
 
 engine = create_engine(
     DATABASE_URL, 
+    connect_args={"sslmode": "require"},
     echo=True, # Mostra os comandos SQL no terminal para debug
     pool_pre_ping=True,
     connect_args={"options": "-c client_encoding=utf8"}
@@ -27,9 +28,5 @@ engine = create_engine(
 
 Base = declarative_base()
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-
-
-def get_session():
-    return SessionLocal()
 
 session = SessionLocal()
