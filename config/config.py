@@ -31,6 +31,6 @@ engine = create_engine(
 #     pool_pre_ping=True
 # )
 
-# Base = declarative_base()
-# SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
-# session = SessionLocal()
+Base = declarative_base()
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+session = SessionLocal()
