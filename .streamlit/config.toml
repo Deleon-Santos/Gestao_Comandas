@@ -1,0 +1,12 @@
+st.markdown("""
+    <style>
+    /* 1. Fundo da Aplicação com Textura e Gradiente Suave */
+    .stApp {
+        background-color: #f4f4f4;
+        background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+        background-attachment: fixed;
+    }
+
+   
+    </style>
+    """, unsafe_allow_html=True)

@@ -15,7 +15,19 @@ except Exception as e:
 gc = GerenciadorComandas(session)
 
 st.set_page_config(layout="wide", page_title="Sistema de Gestão de Comandas")
-st.markdown("<h1 style='text-align: center; color: #007BFF;'>🍽️ Gestão de Comandas</h1>", unsafe_allow_html=True)
+# --- INJEÇÃO DE CSS PARA APLICAR O VISUAL ---
+st.markdown("""
+    <style>
+    /* Fundo da Aplicação (O arquivo config.toml cuida das cores base, aqui cuidamos dos detalhes) */
+    .stApp {
+        background-color: lightorange;
+        background-image: url("https://www.transparenttextures.com/patterns/cubes.png");
+        background-attachment: fixed;
+    }
+
+    </style>
+    """, unsafe_allow_html=True)
+st.markdown("<h1 style='text-align: center; color: #007BFF;'>🍽️ BOCA NERVOSA</h1>", unsafe_allow_html=True)
 
 # Funções Auxiliares de Visualização 
 
