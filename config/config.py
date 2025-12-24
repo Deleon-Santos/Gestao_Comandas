@@ -6,6 +6,7 @@ from sqlalchemy.orm import sessionmaker
 from dotenv import load_dotenv
 load_dotenv()
 
+
 """ Conexão com o banco de dados remoto, deve esta comentado para rodar localmente"""
 DATABASE_URL = st.secrets.get("DATABASE_URL") 
 if not DATABASE_URL:
@@ -21,7 +22,6 @@ engine = create_engine(
     connect_args={"sslmode": "require"},
     pool_pre_ping=True
 )
-
 
 
 """ Conexão com o banco de dados local precisa esta comentado para o uso remoto"""

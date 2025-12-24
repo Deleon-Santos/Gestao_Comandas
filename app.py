@@ -15,7 +15,8 @@ except Exception as e:
 gc = GerenciadorComandas(session)
 
 st.set_page_config(layout="wide", page_title="Sistema de Gestão de Comandas")
-# --- INJEÇÃO DE CSS PARA APLICAR O VISUAL ---
+
+# Estilo Personalizado
 st.markdown("""
     <style>
     /* Fundo da Aplicação (O arquivo config.toml cuida das cores base, aqui cuidamos dos detalhes) */
@@ -30,7 +31,6 @@ st.markdown("""
 st.markdown("<h1 style='text-align: center; color: #007BFF;'>🍽️ BOCA NERVOSA</h1>", unsafe_allow_html=True)
 
 # Funções Auxiliares de Visualização 
-
 def formatar_comanda(comanda):
     total = gc.calcular_total_comanda(comanda.id)
     itens_str = ", ".join([f"{item.quantidade}x {item.produto.nome}" for item in comanda.itens])
@@ -44,7 +44,7 @@ tab_pedidos, tab_comandas, tab_pagamento, tab_produtos = st.tabs(["Pedidos", "Co
 # Gestão de Pedidos
 with tab_pedidos:
     st.header("Pedidos")
-    col1, col2 = st.tabs(["Add Comandas", "Add Produtos"])
+    col1, col2 = st.tabs(["Add Comandas", "Add Itens à Comanda"])
 
     with col1:
         st.subheader("Nova Comanda")
@@ -111,14 +111,12 @@ with tab_pedidos:
                     "Qtd": item.quantidade,
                     "Produto": item.produto.nome,
                     "Preço Unit.": f"R$ {item.preco_unitario:.2f}",
-                    "Subtotal": f"R$ {subtotal:.2f}"
-                })
+                    "Subtotal": f"R$ {subtotal:.2f}"})
             
             st.dataframe(
                 itens_data,
                 hide_index=True, 
-                use_container_width=True 
-            )
+                use_container_width=True)
         else:
             st.info("Nenhum item adicionado a esta comanda ainda.")
 
@@ -178,8 +176,7 @@ with tab_comandas:
                     st.dataframe(
                         itens_data,
                         hide_index=True, 
-                        use_container_width=True 
-                    )
+                        use_container_width=True)
                     
                 else:
                     st.write("Nenhum item nesta comanda.")
@@ -201,14 +198,13 @@ with tab_comandas:
                             st.rerun()
                         else:
                             st.error("Erro ao cancelar comanda.")
-
     else:
         st.info("Nenhuma comanda encontrada com o filtro selecionado.")
 
 
 # Pagamento e Fechamento de Comandas
 with tab_pagamento:
-    st.header("Pagamento e Fechamento")
+    st.header("Efetuar Pagamento")
     
     comandas_fechadas = gc.session.query(Comanda).filter(Comanda.status == Status.fechada).all()
     
@@ -240,7 +236,6 @@ with tab_produtos:
     
     col1, col2 = st.tabs(["Cadastro", "Atualização"])
 
-# --- COLUNA 1: CADASTRO ---
     with col1:
         st.subheader("Cadastro de Novo Produto")
         
@@ -258,7 +253,6 @@ with tab_produtos:
                 else:
                     st.error("Preencha todos os campos.")
 
-    # --- COLUNA 2: ATUALIZAÇÃO ---
     with col2:
         st.subheader("Atualizar Produto")
         
@@ -276,7 +270,6 @@ with tab_produtos:
                     st.rerun()
                 else:
                     st.error("Preencha todos os campos.")
-
                     
     st.markdown("---")
     st.subheader("Cardápio Atual")
@@ -287,8 +280,6 @@ with tab_produtos:
         st.dataframe(
             produtos_data, 
             hide_index=True,  
-            use_container_width=True 
-        )
-        
+            use_container_width=True)    
     else:
         st.info("Nenhum produto cadastrado.")

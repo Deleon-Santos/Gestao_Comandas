@@ -6,24 +6,37 @@ O Sistema de Gestão de Comandas é uma aplicação web leve, desenvolvida em Py
 
 ## ✨ Funcionalidades Principais
 
-O sistema é dividido em três abas principais, oferecendo controle total sobre o ciclo de vida da comanda. 
+O sistema é dividido em quatro abas principais, oferecendo controle total sobre o ciclo de vida da comanda. 
 
-### 1. Comandas e Pedidos
+### 1. Pedidos
 * **Abertura de Comanda:** Permite abrir uma nova comanda associada a um número de mesa específico.
 * **Adição de Itens:** Adiciona múltiplos produtos do cardápio à comanda selecionada, registrando a quantidade e o preço unitário.
+
+### 2. Comandas
 * **Visualização Detalhada:** Exibe todas as comandas, mostrando a data de abertura, status, itens pedidos e o total parcial.
 * **Filtro por Status:** Permite visualizar comandas filtradas por `TODAS`, `Aberta`, `Fechada`, `Cancelada` ou `Paga`.
-* **Ações Rápidas:** Botões para encerrar a comanda (pronta para pagamento) ou cancelar a comanda.
+* **Ações Rápidas:** Botões para encerrar a comanda (liberar para pagamento) ou cancelar a comanda.
 
-### 2. Pagamento e Fechamento
+### 3. Pagamento 
 * **Processamento de Pagamento:** Exibe comandas no status "Fechada" prontas para serem processadas.
 * **Finalização:** Ao confirmar o pagamento, a comanda é movida para o status "Paga".
 
-### 3. Gestão de Cardápio
+### 4. Gestão de Cardápio
 * **Cadastro de Produtos:** Formulário para adicionar novos itens ao cardápio (Nome e Preço).
+* **Atualização de produtos:** Atualiza preço e nome do produto inserido.
 * **Cardápio Atual:** Exibe em formato de tabela todos os produtos cadastrados.
 
 ## 💻 Tecnologias Utilizadas
+
+
+| Categoria | Tecnologia | Função |
+| :--- | :--- | :--- |
+| **Interface (UI)** | **Streamlit** | Criação da interface web interativa com Python. |
+| **Banco de Dados** | **Postgres** | Banco de dados leve e local, ideal para ambientes pequenos. |
+| **Acesso a Dados (ORM)** | **SQLAlchemy** | Mapeador Objeto-Relacional para gerenciar o banco de dados usando classes Python. |
+| **Linguagem Principal** | **Python 3.x** | Linguagem utilizada para todo o desenvolvimento, incluindo o front-end e o back-end. |
+
+---
 
 A aplicação é construída com uma arquitetura modular, separando a interface (front-end) da lógica de negócios e do acesso aos dados.
 
@@ -32,14 +45,6 @@ A aplicação é construída com uma arquitetura modular, separando a interface 
 A aplicação está hospedada no Streamlit Cloud e utiliza um banco de dados **PostgreSQL** gerenciado no **Render**
 Você pode acessar o sistema em tempo real clicando no link 👉 [**Aqui**](https://gestaocomandas-xnuslt9x66pp6w5oad3r2t.streamlit.app/)
 
----
-
-| Categoria | Tecnologia | Função |
-| :--- | :--- | :--- |
-| **Interface (UI)** | **Streamlit** | Criação da interface web interativa com Python. |
-| **Banco de Dados** | **Postgres** | Banco de dados leve e local, ideal para ambientes pequenos. |
-| **Acesso a Dados (ORM)** | **SQLAlchemy** | Mapeador Objeto-Relacional para gerenciar o banco de dados usando classes Python. |
-| **Linguagem Principal** | **Python 3.x** | Linguagem utilizada para todo o desenvolvimento, incluindo o front-end e o back-end. |
 
 ## ⚙️ Configuração e Execução
 
@@ -53,12 +58,15 @@ Certifique-se de ter o Python 3 instalado.
 git clone https://github.com/Deleon-Santos/Gestao_Comandas.git
 
 ```
+Crie o arquivo .env e ajuste lógica de conexão para localhost em `config/config.py`.
+(para testar recomendo o uso de uma conexão sqlite)
+
 ### 2. Instale as dependencial e rode o script
 ```bash
 streamlit run app.py
 ```
 ### Melhorias
-Comverter o Banco de Dados para PostgreSQL e efetuar deploy.
+Aprimorar a ligica de conexão `config/config.py` para que o mesmo codigo possa conectar o banco online ou o banco local quando estiver testando no localhost.
 
 ## Licença
 MIT License.
