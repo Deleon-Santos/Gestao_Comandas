@@ -66,7 +66,8 @@ Crie o arquivo .env e ajuste lógica de conexão para localhost em `config/confi
 streamlit run app.py
 ```
 ### Melhorias
-Aprimorar a ligica de conexão `config/config.py` para que o mesmo codigo possa conectar o banco online ou o banco local quando estiver testando no localhost.
+- Aprimorar a ligica de conexão `config/config.py` para que o mesmo codigo possa conectar o banco online ou o banco local quando estiver testando no localhost.
+- ostra insight de vendas, relatorios de ocupação e venda por data e graficos.
 
 ## Licença
 MIT License.
